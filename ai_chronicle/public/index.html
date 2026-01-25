@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The AI Chronicle - An Infinite Story</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Special+Elite&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="death-overlay" id="deathOverlay"></div>
+
+    <div class="outer-book">
+        <div class="book-spine-left"></div>
+        <div class="book-cover">
+            <div class="book-title">
+                <h1>THE AI CHRONICLE</h1>
+                <p class="subtitle">An Infinite Story</p>
+            </div>
+        </div>
+        <div class="book-spine-right"></div>
+    </div>
+
+    <div class="inner-book" id="gameContainer">
+        <div class="book-page left-page">
+            <div class="page-ornament top"></div>
+            <div class="page-content" id="leftPage">
+                <div class="chapter-header">
+                    <h2>Chapter I</h2>
+                    <div class="ornamental-line"></div>
+                </div>
+                <div id="storyText" class="story-text">
+                    <p class="loading">The Chronicle opens before you...</p>
+                </div>
+            </div>
+            <div class="page-ornament bottom"></div>
+            <div class="page-number">1</div>
+        </div>
+
+        <div class="book-page right-page">
+            <div class="page-ornament top"></div>
+            <div class="page-content" id="rightPage">
+                <div id="choicesContainer" class="choices-container"></div>
+
+                <div id="slotMachine" class="slot-machine hidden">
+                    <div class="slot-title">Fate's Dice</div>
+                    <div class="dice-container">
+                        <div class="die" id="die1">⚀</div>
+                        <div class="die" id="die2">⚀</div>
+                        <div class="die" id="die3">⚀</div>
+                    </div>
+                    <div class="slot-probability"></div>
+                    <button class="roll-button" id="rollButton">Cast the Dice</button>
+                </div>
+
+                <div id="statusPanel" class="status-panel">
+                    <div class="status-section">
+                        <h3>Protagonist</h3>
+                        <p id="protagonistName">Unknown</p>
+                    </div>
+                    <div class="status-section">
+                        <h3>Companions</h3>
+                        <ul id="companionsList"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="page-ornament bottom"></div>
+            <div class="page-number">2</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" id="newGameBtn">New Chronicle</button>
+        <button class="control-btn" id="saveGameBtn">Save Chronicle</button>
+        <button class="control-btn" id="loadGameBtn">Load Chronicle</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,448 @@
+:root {
+    --sepia-dark: #3e2723;
+    --sepia-medium: #704214;
+    --sepia-light: #8d6e63;
+    --sepia-page: #f4e8d8;
+    --sepia-page-dark: #e8dcc8;
+    --sepia-text: #2c1810;
+    --shadow: rgba(0, 0, 0, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'IM Fell English', serif;
+    background: linear-gradient(135deg, var(--sepia-dark) 0%, var(--sepia-medium) 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: var(--sepia-text);
+    overflow-x: hidden;
+}
+
+/* Death Overlay */
+.death-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: opacity 3s ease-in-out;
+}
+
+.death-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Outer Book (Cover) */
+.outer-book {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 2rem;
+    filter: drop-shadow(0 10px 30px var(--shadow));
+}
+
+.book-spine-left,
+.book-spine-right {
+    width: 20px;
+    background: linear-gradient(to right, var(--sepia-dark), var(--sepia-medium));
+    border: 2px solid var(--sepia-dark);
+}
+
+.book-cover {
+    background: linear-gradient(135deg, var(--sepia-medium) 0%, var(--sepia-light) 100%);
+    padding: 3rem 4rem;
+    border: 3px solid var(--sepia-dark);
+    border-left: none;
+    border-right: none;
+    position: relative;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.2);
+}
+
+.book-cover::before {
+    content: '';
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    border: 2px solid var(--sepia-dark);
+    opacity: 0.3;
+}
+
+.book-title {
+    text-align: center;
+    color: var(--sepia-page);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.book-title h1 {
+    font-size: 3rem;
+    letter-spacing: 0.3rem;
+    margin-bottom: 0.5rem;
+    font-weight: normal;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    font-style: italic;
+    letter-spacing: 0.2rem;
+    opacity: 0.9;
+}
+
+/* Inner Book (Pages) */
+.inner-book {
+    display: flex;
+    background: var(--sepia-page);
+    border: 3px solid var(--sepia-dark);
+    box-shadow: 0 20px 60px var(--shadow);
+    max-width: 1200px;
+    width: 100%;
+    min-height: 600px;
+}
+
+.book-page {
+    flex: 1;
+    padding: 3rem 2.5rem;
+    position: relative;
+    background: var(--sepia-page);
+}
+
+.left-page {
+    border-right: 2px solid var(--sepia-page-dark);
+    background: linear-gradient(to right, var(--sepia-page-dark) 0%, var(--sepia-page) 100%);
+}
+
+.right-page {
+    background: linear-gradient(to left, var(--sepia-page-dark) 0%, var(--sepia-page) 100%);
+}
+
+.page-ornament {
+    height: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 10 Q25 0, 50 10 T100 10' stroke='%233e2723' fill='none' stroke-width='0.5' opacity='0.3'/%3E%3C/svg%3E");
+    background-repeat: repeat-x;
+    background-position: center;
+    opacity: 0.5;
+}
+
+.page-content {
+    min-height: 500px;
+}
+
+.page-number {
+    position: absolute;
+    bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--sepia-medium);
+    font-family: 'Special Elite', monospace;
+}
+
+.left-page .page-number {
+    left: 2.5rem;
+}
+
+.right-page .page-number {
+    right: 2.5rem;
+}
+
+/* Chapter Header */
+.chapter-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.chapter-header h2 {
+    font-size: 2rem;
+    font-weight: normal;
+    letter-spacing: 0.2rem;
+    color: var(--sepia-dark);
+}
+
+.ornamental-line {
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--sepia-medium), transparent);
+    margin: 1rem auto;
+    width: 60%;
+}
+
+/* Story Text */
+.story-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    text-align: justify;
+    font-family: 'Special Elite', monospace;
+    color: var(--sepia-text);
+}
+
+.story-text p {
+    margin-bottom: 1.2rem;
+    opacity: 0;
+    animation: fadeIn 1s ease-in forwards;
+}
+
+.story-text p.loading {
+    text-align: center;
+    font-style: italic;
+    opacity: 0.6;
+    animation: pulse 2s infinite;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+}
+
+/* Choices */
+.choices-container {
+    margin-top: 2rem;
+}
+
+.choice-btn {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: var(--sepia-page-dark);
+    border: 2px solid var(--sepia-medium);
+    color: var(--sepia-text);
+    font-family: 'Special Elite', monospace;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+}
+
+.choice-btn::before {
+    content: '⟩';
+    position: absolute;
+    left: -20px;
+    transition: left 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.choice-btn:hover {
+    background: var(--sepia-light);
+    color: var(--sepia-page);
+    border-color: var(--sepia-dark);
+    transform: translateX(5px);
+}
+
+.choice-btn:hover::before {
+    left: 10px;
+}
+
+.choice-probability {
+    font-size: 0.85rem;
+    color: var(--sepia-medium);
+    font-style: italic;
+    margin-top: 0.3rem;
+}
+
+/* Slot Machine / Dice */
+.slot-machine {
+    text-align: center;
+    padding: 2rem;
+    background: var(--sepia-page-dark);
+    border: 2px solid var(--sepia-medium);
+    border-radius: 10px;
+    margin: 2rem 0;
+}
+
+.slot-machine.hidden {
+    display: none;
+}
+
+.slot-title {
+    font-size: 1.5rem;
+    color: var(--sepia-dark);
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.1rem;
+}
+
+.dice-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.die {
+    width: 80px;
+    height: 80px;
+    background: var(--sepia-page);
+    border: 3px solid var(--sepia-dark);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    box-shadow: 0 4px 8px var(--shadow);
+    transition: transform 0.1s ease;
+}
+
+.die.rolling {
+    animation: rollDice 0.1s infinite;
+}
+
+@keyframes rollDice {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(90deg) scale(1.1); }
+    50% { transform: rotate(180deg) scale(0.9); }
+    75% { transform: rotate(270deg) scale(1.1); }
+}
+
+.slot-probability {
+    font-size: 1rem;
+    color: var(--sepia-medium);
+    margin: 1rem 0;
+    font-family: 'Special Elite', monospace;
+}
+
+.roll-button {
+    padding: 1rem 2rem;
+    background: var(--sepia-medium);
+    color: var(--sepia-page);
+    border: 2px solid var(--sepia-dark);
+    font-family: 'IM Fell English', serif;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.1rem;
+}
+
+.roll-button:hover {
+    background: var(--sepia-dark);
+    transform: scale(1.05);
+}
+
+.roll-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Status Panel */
+.status-panel {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    background: var(--sepia-page-dark);
+    border: 2px solid var(--sepia-medium);
+    border-radius: 5px;
+}
+
+.status-section {
+    margin-bottom: 1.5rem;
+}
+
+.status-section:last-child {
+    margin-bottom: 0;
+}
+
+.status-section h3 {
+    font-size: 1.2rem;
+    color: var(--sepia-dark);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05rem;
+    font-weight: normal;
+}
+
+.status-section p {
+    font-family: 'Special Elite', monospace;
+    font-size: 1rem;
+    color: var(--sepia-text);
+}
+
+.status-section ul {
+    list-style: none;
+    font-family: 'Special Elite', monospace;
+    font-size: 0.95rem;
+}
+
+.status-section li {
+    padding: 0.3rem 0;
+    color: var(--sepia-text);
+}
+
+.status-section li::before {
+    content: '• ';
+    color: var(--sepia-medium);
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.control-btn {
+    padding: 0.8rem 1.5rem;
+    background: var(--sepia-page-dark);
+    color: var(--sepia-text);
+    border: 2px solid var(--sepia-medium);
+    font-family: 'IM Fell English', serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.05rem;
+}
+
+.control-btn:hover {
+    background: var(--sepia-medium);
+    color: var(--sepia-page);
+    border-color: var(--sepia-dark);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .inner-book {
+        flex-direction: column;
+    }
+
+    .left-page {
+        border-right: none;
+        border-bottom: 2px solid var(--sepia-page-dark);
+    }
+
+    .book-title h1 {
+        font-size: 2rem;
+    }
+
+    .story-text {
+        font-size: 1rem;
+    }
+
+    .dice-container {
+        gap: 0.5rem;
+    }
+
+    .die {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+    }
+}

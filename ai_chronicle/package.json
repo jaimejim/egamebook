@@ -1,0 +1,17 @@
+{
+  "name": "ai-chronicle",
+  "version": "1.0.0",
+  "description": "AI-generated choose-your-own-adventure storybook",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required'",
+    "start": "vercel dev"
+  },
+  "keywords": ["ai", "story", "game", "interactive-fiction"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.1"
+  }
+}
