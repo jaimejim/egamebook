@@ -1,27 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "ai_chronicle/public/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "ai_chronicle/api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/story",
-      "dest": "/ai_chronicle/api/story.js"
-    },
-    {
-      "src": "/",
-      "dest": "/ai_chronicle/public/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/ai_chronicle/public/$1"
-    }
+  "buildCommand": "cd ai_chronicle && npm install",
+  "outputDirectory": "ai_chronicle/public",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/:path*" }
   ]
 }
