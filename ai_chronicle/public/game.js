@@ -70,11 +70,22 @@ class AIChronicle {
                 })
             });
 
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+            }
+
             const data = await response.json();
+
+            // Check if response is an error
+            if (data.error) {
+                throw new Error(data.hint ? `${data.message}\n\n${data.hint}` : data.message);
+            }
+
             this.processStoryResponse(data);
         } catch (error) {
             console.error('Error starting game:', error);
-            this.showError('Failed to start the chronicle. Please try again.');
+            this.showError(`Failed to start the chronicle.\n\n${error.message}\n\nPlease check the console for details.`);
         }
     }
 
@@ -314,7 +325,14 @@ class AIChronicle {
     }
 
     showError(message) {
-        this.elements.storyText.innerHTML = `<p style="color: var(--sepia-medium); text-align: center;">${message}</p>`;
+        // Convert line breaks to HTML
+        const formattedMessage = message.replace(/\n/g, '<br>');
+        this.elements.storyText.innerHTML = `
+            <div style="color: var(--sepia-medium); text-align: center; padding: 2rem; max-width: 600px; margin: 0 auto;">
+                <p style="margin-bottom: 1rem; font-weight: bold;">⚠️ Error</p>
+                <p style="line-height: 1.6;">${formattedMessage}</p>
+            </div>
+        `;
     }
 
     triggerDeath(deathMessage) {

@@ -1,6 +1,15 @@
 const Anthropic = require('@anthropic-ai/sdk');
 const OpenAI = require('openai');
 
+// Check for required API keys
+if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('CRITICAL: ANTHROPIC_API_KEY is not set in environment variables!');
+}
+
+if (!process.env.OPENAI_API_KEY) {
+    console.warn('WARNING: OPENAI_API_KEY is not set. Image generation will be disabled.');
+}
+
 const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
 });
@@ -242,6 +251,16 @@ module.exports = async (req, res) => {
         return;
     }
 
+    // Check for API key before processing
+    if (!process.env.ANTHROPIC_API_KEY) {
+        res.status(500).json({
+            error: 'Configuration Error',
+            message: 'ANTHROPIC_API_KEY is not configured. Please set environment variables in Vercel dashboard.',
+            hint: 'Go to Vercel Dashboard → Project → Settings → Environment Variables'
+        });
+        return;
+    }
+
     try {
         const { action, state, choice, success, previousData } = req.body;
 
@@ -256,9 +275,23 @@ module.exports = async (req, res) => {
 
     } catch (error) {
         console.error('API Error:', error);
+
+        // Provide more specific error messages
+        let errorMessage = error.message;
+        let hint = null;
+
+        if (error.message.includes('API key')) {
+            errorMessage = 'Invalid API key configuration';
+            hint = 'Please check your ANTHROPIC_API_KEY in Vercel environment variables';
+        } else if (error.message.includes('rate limit')) {
+            errorMessage = 'API rate limit exceeded';
+            hint = 'Please wait a moment and try again';
+        }
+
         res.status(500).json({
             error: 'Failed to generate story',
-            message: error.message
+            message: errorMessage,
+            hint: hint
         });
     }
 };
