@@ -6,7 +6,7 @@ class GameState {
         this.storyHistory = [];
         this.currentContext = '';
         this.isAlive = true;
-        this.chapterNumber = 1;
+        this.pageNumber = 1;
     }
 
     toJSON() {
@@ -16,7 +16,7 @@ class GameState {
             storyHistory: this.storyHistory,
             currentContext: this.currentContext,
             isAlive: this.isAlive,
-            chapterNumber: this.chapterNumber
+            pageNumber: this.pageNumber
         };
     }
 
@@ -41,9 +41,8 @@ class AIChronicle {
             choicesContainer: document.getElementById('choicesContainer'),
             slotMachine: document.getElementById('slotMachine'),
             rollButton: document.getElementById('rollButton'),
-            protagonistName: document.getElementById('protagonistName'),
-            companionsList: document.getElementById('companionsList'),
             deathOverlay: document.getElementById('deathOverlay'),
+            pageIndicator: document.getElementById('pageIndicator'),
             newGameBtn: document.getElementById('newGameBtn'),
             saveGameBtn: document.getElementById('saveGameBtn'),
             loadGameBtn: document.getElementById('loadGameBtn')
@@ -253,7 +252,8 @@ class AIChronicle {
     }
 
     displayStoryText(text, imageUrl = null) {
-        this.elements.storyText.innerHTML = '';
+        // Don't clear - append to existing text for continuous story
+        // this.elements.storyText.innerHTML = '';
 
         // Add image if provided
         if (imageUrl) {
@@ -268,15 +268,26 @@ class AIChronicle {
         }
 
         const paragraphs = text.split('\n\n');
+        const currentParagraphCount = this.elements.storyText.querySelectorAll('p:not(.loading)').length;
 
         paragraphs.forEach((para, index) => {
             if (para.trim()) {
                 const p = document.createElement('p');
                 p.textContent = para;
-                p.style.animationDelay = `${(imageUrl ? index + 0.5 : index) * 0.3}s`;
+                p.style.animationDelay = `${index * 0.3}s`;
                 this.elements.storyText.appendChild(p);
             }
         });
+
+        // Increment page every ~500 words (roughly 2 pages per story segment)
+        const wordCount = text.split(/\s+/).length;
+        if (wordCount > 200) {
+            this.state.pageNumber += Math.floor(wordCount / 250);
+            this.updateUI();
+        }
+
+        // Scroll to bottom to show new content
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
     displayChoices(choices) {
@@ -324,25 +335,8 @@ class AIChronicle {
     }
 
     updateUI() {
-        // Update protagonist
-        this.elements.protagonistName.textContent =
-            this.state.protagonist.name || 'Unknown';
-
-        // Update companions
-        this.elements.companionsList.innerHTML = '';
-        this.state.companions.forEach(companion => {
-            const li = document.createElement('li');
-            li.textContent = typeof companion === 'string' ? companion : companion.name;
-            this.elements.companionsList.appendChild(li);
-        });
-
-        if (this.state.companions.length === 0) {
-            const li = document.createElement('li');
-            li.textContent = 'None';
-            li.style.fontStyle = 'italic';
-            li.style.opacity = '0.6';
-            this.elements.companionsList.appendChild(li);
-        }
+        // Update page number
+        this.elements.pageIndicator.textContent = `Page ${this.state.pageNumber}`;
     }
 
     saveGame() {
