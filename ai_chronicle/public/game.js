@@ -32,7 +32,7 @@ class AIChronicle {
     constructor() {
         this.state = new GameState();
         this.initializeUI();
-        this.startNewGame();
+        this.checkHealth();
     }
 
     initializeUI() {
@@ -55,6 +55,33 @@ class AIChronicle {
         this.elements.loadGameBtn.addEventListener('click', () => this.loadGame());
     }
 
+    async checkHealth() {
+        this.showLoading();
+
+        try {
+            const response = await fetch('/api/health');
+            const health = await response.json();
+
+            console.log('Health check:', health);
+
+            if (health.status === 'error') {
+                this.showError(`Configuration Error\n\n${health.message}\n\nPlease check:\n- ANTHROPIC_API_KEY: ${health.checks.anthropicKey.format}\n- OPENAI_API_KEY: ${health.checks.openaiKey.format}\n\nGo to Vercel Dashboard → Settings → Environment Variables to add them.`);
+                return;
+            }
+
+            if (health.status === 'warning') {
+                console.warn('Warning:', health.message);
+            }
+
+            // Health check passed, start the game
+            this.startNewGame();
+
+        } catch (error) {
+            console.error('Health check failed:', error);
+            this.showError(`Failed to connect to game server\n\n${error.message}\n\nPlease refresh the page or check your internet connection.`);
+        }
+    }
+
     async startNewGame() {
         this.state = new GameState();
         this.updateUI();
@@ -70,22 +97,21 @@ class AIChronicle {
                 })
             });
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
-            }
-
             const data = await response.json();
 
             // Check if response is an error
-            if (data.error) {
-                throw new Error(data.hint ? `${data.message}\n\n${data.hint}` : data.message);
+            if (data.error || !response.ok) {
+                const errorMsg = data.message || `HTTP ${response.status}: ${response.statusText}`;
+                const hint = data.hint || '';
+                const fullError = hint ? `${errorMsg}\n\n${hint}` : errorMsg;
+                throw new Error(fullError);
             }
 
             this.processStoryResponse(data);
         } catch (error) {
             console.error('Error starting game:', error);
-            this.showError(`Failed to start the chronicle.\n\n${error.message}\n\nPlease check the console for details.`);
+            const detailedError = error.message || 'Unknown error occurred';
+            this.showError(`Failed to start the chronicle\n\n${detailedError}\n\nCheck the browser console (F12) for more details.`);
         }
     }
 
@@ -325,12 +351,18 @@ class AIChronicle {
     }
 
     showError(message) {
-        // Convert line breaks to HTML
-        const formattedMessage = message.replace(/\n/g, '<br>');
+        // Convert line breaks to HTML with better spacing
+        const formattedMessage = message
+            .replace(/\n\n/g, '</p><p style="margin: 1rem 0; line-height: 1.6;">')
+            .replace(/\n/g, '<br>');
+
         this.elements.storyText.innerHTML = `
-            <div style="color: var(--sepia-medium); text-align: center; padding: 2rem; max-width: 600px; margin: 0 auto;">
-                <p style="margin-bottom: 1rem; font-weight: bold;">⚠️ Error</p>
-                <p style="line-height: 1.6;">${formattedMessage}</p>
+            <div style="color: var(--sepia-medium); padding: 2rem; max-width: 700px; margin: 0 auto; text-align: left;">
+                <p style="margin-bottom: 1.5rem; font-weight: bold; font-size: 1.2rem; text-align: center;">⚠️ Error</p>
+                <p style="margin: 1rem 0; line-height: 1.6;">${formattedMessage}</p>
+                <p style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--sepia-light); font-size: 0.9rem; text-align: center; opacity: 0.8;">
+                    Press F12 to open browser console for technical details
+                </p>
             </div>
         `;
     }
