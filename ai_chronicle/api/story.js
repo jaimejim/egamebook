@@ -1,7 +1,12 @@
 const Anthropic = require('@anthropic-ai/sdk');
+const OpenAI = require('openai');
 
 const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
 });
 
 // System prompt for the AI storyteller
@@ -184,31 +189,32 @@ Continue the narrative. You may introduce new situations, characters, or develop
     }
 }
 
-// Placeholder for image generation
-// TODO: Replace with actual API integration (DALL-E, Stability AI, etc.)
+// Generate sepia-toned vintage images using DALL-E 3
 async function generateImage(prompt) {
-    // For now, return null - images will be added in next phase
-    // When ready, this will call: OpenAI DALL-E, Stability AI, or similar
-    console.log('Image prompt:', prompt);
+    try {
+        console.log('Generating image with prompt:', prompt);
 
-    // Example integration structure:
-    // const response = await fetch('https://api.openai.com/v1/images/generations', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-    //         'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify({
-    //         prompt: prompt,
-    //         n: 1,
-    //         size: '512x512',
-    //         style: 'natural'
-    //     })
-    // });
-    // const data = await response.json();
-    // return data.data[0].url;
+        // Enhance prompt for sepia vintage aesthetic
+        const enhancedPrompt = `${prompt}. Style: Sepia-toned vintage photograph from 1963, grainy film texture, dramatic noir lighting, high contrast black and white photograph with sepia filter, vintage documentary photography aesthetic, realistic but atmospheric`;
 
-    return null; // For now, no images
+        const response = await openai.images.generate({
+            model: "dall-e-3",
+            prompt: enhancedPrompt,
+            n: 1,
+            size: "1024x1024",
+            quality: "standard",
+            style: "natural"
+        });
+
+        const imageUrl = response.data[0].url;
+        console.log('Image generated successfully:', imageUrl);
+
+        return imageUrl;
+    } catch (error) {
+        console.error('DALL-E image generation error:', error);
+        // Return null on error - story continues without image
+        return null;
+    }
 }
 
 module.exports = async (req, res) => {
