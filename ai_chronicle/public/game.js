@@ -59,45 +59,88 @@ class AIChronicle {
         this.showLoading();
 
         try {
-            const response = await fetch('/api/health');
-            const health = await response.json();
+            console.log('[Health Check] Starting health check...');
+            const response = await fetch('/api/health', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
 
-            console.log('Health check:', health);
+            console.log('[Health Check] Response status:', response.status);
+            console.log('[Health Check] Response headers:', Object.fromEntries(response.headers.entries()));
+
+            let health;
+            try {
+                const text = await response.text();
+                console.log('[Health Check] Response body:', text);
+                health = JSON.parse(text);
+            } catch (parseError) {
+                console.error('[Health Check] Failed to parse response:', parseError);
+                this.showError(`Server Error\n\nThe server returned an invalid response.\n\nThis might be a deployment issue. Try refreshing the page.\n\nTechnical details: ${parseError.message}`);
+                return;
+            }
+
+            console.log('[Health Check] Parsed response:', health);
 
             if (health.status === 'error') {
-                this.showError(`Configuration Error\n\n${health.message}\n\nPlease check:\n- ANTHROPIC_API_KEY: ${health.checks.anthropicKey.format}\n- OPENAI_API_KEY: ${health.checks.openaiKey.format}\n\nGo to Vercel Dashboard → Settings → Environment Variables to add them.`);
+                const keyStatus = `- ANTHROPIC_API_KEY: ${health.checks?.anthropicKey?.format || 'unknown'}\n- OPENAI_API_KEY: ${health.checks?.openaiKey?.format || 'unknown'}`;
+                this.showError(`Configuration Error\n\n${health.message}\n\nAPI Key Status:\n${keyStatus}\n\nTo fix this:\n1. Go to Vercel Dashboard\n2. Select your project\n3. Go to Settings → Environment Variables\n4. Add the missing keys\n5. Redeploy the project`);
                 return;
             }
 
             if (health.status === 'warning') {
-                console.warn('Warning:', health.message);
+                console.warn('[Health Check] Warning:', health.message);
             }
 
+            console.log('[Health Check] Health check passed, starting game...');
             // Health check passed, start the game
             this.startNewGame();
 
         } catch (error) {
-            console.error('Health check failed:', error);
-            this.showError(`Failed to connect to game server\n\n${error.message}\n\nPlease refresh the page or check your internet connection.`);
+            console.error('[Health Check] Failed:', error);
+            console.error('[Health Check] Error stack:', error.stack);
+            this.showError(`Failed to Connect to Game Server\n\n${error.message}\n\nPossible causes:\n- Deployment is still in progress\n- Server is temporarily unavailable\n- Network connectivity issues\n\nTry:\n1. Refresh the page\n2. Check your internet connection\n3. Wait a minute and try again`);
         }
     }
 
     async startNewGame() {
+        console.log('[Game] Starting new game...');
         this.state = new GameState();
         this.updateUI();
         this.showLoading();
 
         try {
+            const requestBody = {
+                action: 'start',
+                state: this.state.toJSON()
+            };
+
+            console.log('[Game] Sending request to /api/story:', requestBody);
+
             const response = await fetch('/api/story', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'start',
-                    state: this.state.toJSON()
-                })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
             });
 
-            const data = await response.json();
+            console.log('[Game] Response status:', response.status);
+            console.log('[Game] Response headers:', Object.fromEntries(response.headers.entries()));
+
+            let data;
+            try {
+                const text = await response.text();
+                console.log('[Game] Response body (first 500 chars):', text.substring(0, 500));
+                data = JSON.parse(text);
+            } catch (parseError) {
+                console.error('[Game] Failed to parse response:', parseError);
+                throw new Error(`Server returned invalid JSON: ${parseError.message}`);
+            }
+
+            console.log('[Game] Parsed response:', data);
 
             // Check if response is an error
             if (data.error || !response.ok) {
@@ -107,11 +150,15 @@ class AIChronicle {
                 throw new Error(fullError);
             }
 
+            console.log('[Game] Successfully received story data');
             this.processStoryResponse(data);
+
         } catch (error) {
-            console.error('Error starting game:', error);
+            console.error('[Game] Error starting game:', error);
+            console.error('[Game] Error stack:', error.stack);
+
             const detailedError = error.message || 'Unknown error occurred';
-            this.showError(`Failed to start the chronicle\n\n${detailedError}\n\nCheck the browser console (F12) for more details.`);
+            this.showError(`Failed to Start the Chronicle\n\n${detailedError}\n\nDebugging info:\n- Check browser console (F12) for detailed logs\n- Verify API keys are set in Vercel\n- Ensure deployment completed successfully`);
         }
     }
 
