@@ -36,13 +36,17 @@ Your role:
 7. Generate image prompts for key visual moments
 
 Story Guidelines:
+- TARGET: Create a complete story spanning ~50 pages worth of narrative (12,000-15,000 words total)
 - Authentic 1960s details (Cold War context, technology, fashion, social attitudes)
 - Stockholm locations and Nobel ceremony protocol (week-long events, formal dress, Swedish customs)
 - Character types: Nobel laureates (Physics, Chemistry, Medicine, Literature, Peace), journalists, diplomats, Swedish hosts, royal staff, spies
 - Themes: ambition, scandal, loyalty, betrayal, Cold War tensions, human excellence and frailty
 - Death can come from scandal/disgrace (career destruction) or physical danger
 - Nobel Week structure guides pacing (arrival → receptions → ceremony → banquet → aftermath)
-- Keep paragraphs concise but evocative (2-4 sentences)
+- Each story segment should be 200-400 words (building toward 50-page total)
+- CRITICAL: Remember and reference ALL past choices and events in the story history
+- Build narrative momentum - each segment should advance plot, deepen character, or reveal secrets
+- Vary pacing: some segments have choices, some are pure narrative continuation
 
 IMAGE GENERATION:
 Generate image prompts when:
@@ -114,14 +118,15 @@ Continue the story based on this ${outcome.toLowerCase()}. Show the consequences
             break;
 
         case 'continue':
-            userMessage = `Continue the story naturally.
+            userMessage = `Continue the story naturally, building toward a complete 50-page narrative.
 
+Current page: ${state.pageNumber || 1}
 Current context: ${state.currentContext}
 Protagonist: ${state.protagonist?.name || 'unnamed'}
 Companions: ${state.companions?.join(', ') || 'none'}
-Recent story: ${state.storyHistory.slice(-2).join('\n\n')}
+Recent story: ${state.storyHistory.slice(-3).join('\n\n')}
 
-Continue the narrative. You may introduce new situations, characters, or developments. Present choices when narratively appropriate (not required every turn).`;
+Continue the narrative (200-400 words). Build on everything that has happened. Reference past choices and events. You may introduce new situations, characters, or developments. Present choices when narratively appropriate (not every turn). Generate an image prompt if entering a new scene or meeting a significant character.`;
             break;
 
         default:
