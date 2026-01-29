@@ -114,7 +114,7 @@ class AIChronicle {
         // Add to story history
         if (data.text) {
             this.state.storyHistory.push(data.text);
-            this.displayStoryText(data.text);
+            this.displayStoryText(data.text, data.imageUrl);
         }
 
         // Update context
@@ -252,15 +252,28 @@ class AIChronicle {
         this.elements.slotMachine.classList.add('hidden');
     }
 
-    displayStoryText(text) {
+    displayStoryText(text, imageUrl = null) {
         this.elements.storyText.innerHTML = '';
+
+        // Add image if provided
+        if (imageUrl) {
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'story-image-container';
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.className = 'story-image';
+            img.alt = 'Scene illustration';
+            imgContainer.appendChild(img);
+            this.elements.storyText.appendChild(imgContainer);
+        }
+
         const paragraphs = text.split('\n\n');
 
         paragraphs.forEach((para, index) => {
             if (para.trim()) {
                 const p = document.createElement('p');
                 p.textContent = para;
-                p.style.animationDelay = `${index * 0.3}s`;
+                p.style.animationDelay = `${(imageUrl ? index + 0.5 : index) * 0.3}s`;
                 this.elements.storyText.appendChild(p);
             }
         });

@@ -5,24 +5,48 @@ const anthropic = new Anthropic({
 });
 
 // System prompt for the AI storyteller
-const SYSTEM_PROMPT = `You are a master storyteller creating an interactive, choose-your-own-adventure narrative in the style of classic science fiction literature like Isaac Asimov's Foundation series.
+const SYSTEM_PROMPT = `You are a master storyteller creating an interactive narrative set in Stockholm during Nobel Prize week in December 1963.
+
+SETTING: Nobel Prize Week, Stockholm, December 1963
+- Locations: Grand Hotel Stockholm, Stockholm Concert Hall, City Hall, Royal Palace
+- Cold Swedish winter - early darkness, snow, candlelight
+- Nobel laureates from around the world, journalists, diplomats, Swedish royalty
+- Cold War era - tensions between East and West beneath formal ceremony
+- Mix of glamorous banquets and dark secrets
+
+ATMOSPHERE: Literary thriller inspired by Irving Wallace's "The Prize"
+- Sophisticated, sepia-toned literary prose
+- Elegant surface concealing intrigue and scandal
+- Personal dramas intersecting with historical/political tensions
+- Moral complexity - everyone has secrets, ambitions, vulnerabilities
+- 1960s authenticity - fashion, technology, social norms of the era
 
 Your role:
-1. Generate rich, immersive narrative text in a literary style
-2. Create a persistent protagonist and supporting characters
-3. Maintain narrative coherence across all story beats
-4. Occasionally present meaningful choices to the player (not every turn)
-5. Determine when dramatic moments require a dice roll (probability-based outcomes)
-6. Track when the protagonist dies (injuries, dangerous situations, critical failures)
+1. Generate rich narrative capturing Stockholm's winter elegance and underlying tension
+2. Create compelling characters with depth - laureates, journalists, diplomats, locals
+3. Weave together personal stories, political intrigue, scandals, and human drama
+4. Present meaningful choices at dramatic moments (not every turn)
+5. Use dice rolls for risky actions: confrontations, investigations, gambles, dangerous decisions
+6. Track consequences - reputation/scandal can end a career, physical danger can be fatal
+7. Generate image prompts for key visual moments
 
 Story Guidelines:
-- Write in a sepia-toned, classic sci-fi literary style
+- Authentic 1960s details (Cold War context, technology, fashion, social attitudes)
+- Stockholm locations and Nobel ceremony protocol (week-long events, formal dress, Swedish customs)
+- Character types: Nobel laureates (Physics, Chemistry, Medicine, Literature, Peace), journalists, diplomats, Swedish hosts, royal staff, spies
+- Themes: ambition, scandal, loyalty, betrayal, Cold War tensions, human excellence and frailty
+- Death can come from scandal/disgrace (career destruction) or physical danger
+- Nobel Week structure guides pacing (arrival → receptions → ceremony → banquet → aftermath)
 - Keep paragraphs concise but evocative (2-4 sentences)
-- Build a coherent universe with consistent lore
-- Characters should feel real with motivations and personalities
-- Death is final - if the protagonist dies, make it meaningful
-- Not every choice needs a dice roll - only truly risky/uncertain actions
-- Let the story flow naturally; choices appear when narratively appropriate
+
+IMAGE GENERATION:
+Generate image prompts when:
+- A new major scene begins (arriving at Grand Hotel, entering Concert Hall, etc.)
+- A significant character is introduced
+- A dramatic twist or revelation occurs
+- Visual atmosphere is crucial to the moment
+
+Image style: "Sepia-toned vintage photograph, 1960s Stockholm, film noir aesthetic, grainy texture, dramatic lighting"
 
 Response Format:
 You must respond with a valid JSON object containing:
@@ -36,6 +60,7 @@ You must respond with a valid JSON object containing:
     "requiresDiceRoll": false,
     "probability": 0.5,
     "rollReason": "why this needs a dice roll",
+    "imagePrompt": "detailed image generation prompt in sepia style, or null if no image needed",
     "choices": [
         {"text": "choice text", "id": "choice_id", "probability": 0.7}
     ]
@@ -48,7 +73,17 @@ async function generateStory(action, state, choice = null, diceSuccess = null, p
 
     switch (action) {
         case 'start':
-            userMessage = `Begin a new story. Create a compelling protagonist and set the opening scene. Establish the world, introduce the main character, and set up the initial situation. The story should have a mysterious, literary quality.`;
+            userMessage = `Begin a new story set in Stockholm, December 1963, during Nobel Prize week.
+
+FIRST: Present the player with initial choices to establish their character:
+1. A journalist covering the Nobel ceremonies (American or European press)
+2. A diplomat's aide attending the events
+3. A Swedish interpreter/guide for the laureates
+4. Let fate decide (you pick a compelling role)
+
+Present these as choices so the player can select their path into the story.
+
+After they choose, create their specific character, give them a name, and set the opening scene arriving in Stockholm. Generate an atmospheric image prompt for the opening (winter Stockholm, Grand Hotel arrival, etc.).`;
             break;
 
         case 'choice':
@@ -128,12 +163,52 @@ Continue the narrative. You may introduce new situations, characters, or develop
             };
         }
 
+        // Generate image if prompt is provided
+        if (storyData.imagePrompt) {
+            try {
+                // For now, we'll use a placeholder system
+                // TODO: Integrate with DALL-E, Midjourney, or Stability AI
+                storyData.imageUrl = await generateImage(storyData.imagePrompt);
+            } catch (imageError) {
+                console.error('Image generation failed:', imageError);
+                // Continue without image
+                storyData.imageUrl = null;
+            }
+        }
+
         return storyData;
 
     } catch (error) {
         console.error('Error generating story:', error);
         throw error;
     }
+}
+
+// Placeholder for image generation
+// TODO: Replace with actual API integration (DALL-E, Stability AI, etc.)
+async function generateImage(prompt) {
+    // For now, return null - images will be added in next phase
+    // When ready, this will call: OpenAI DALL-E, Stability AI, or similar
+    console.log('Image prompt:', prompt);
+
+    // Example integration structure:
+    // const response = await fetch('https://api.openai.com/v1/images/generations', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+    //         'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify({
+    //         prompt: prompt,
+    //         n: 1,
+    //         size: '512x512',
+    //         style: 'natural'
+    //     })
+    // });
+    // const data = await response.json();
+    // return data.data[0].url;
+
+    return null; // For now, no images
 }
 
 module.exports = async (req, res) => {

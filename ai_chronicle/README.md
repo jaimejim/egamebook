@@ -1,8 +1,16 @@
 # The AI Chronicle
 
-An AI-generated, choose-your-own-adventure storybook with a beautiful sepia aesthetic inspired by classic science fiction literature like Isaac Asimov's Foundation series.
+An AI-generated, choose-your-own-adventure storybook set in Stockholm during Nobel Prize week, December 1963. Inspired by Irving Wallace's "The Prize," this interactive narrative blends literary thriller elements with character drama, Cold War tensions, and the glamour of Nobel ceremonies.
 
 🎮 **Live Demo**: Coming soon!
+
+## Setting
+
+**Stockholm, December 1963 - Nobel Prize Week**
+- Navigate the elegant world of Nobel laureates, diplomats, and journalists
+- Experience the Grand Hotel, Stockholm Concert Hall, and Royal Palace
+- Uncover secrets, scandals, and intrigue beneath the formal ceremonies
+- Your choices shape the story in this Cold War era thriller
 
 ## Features
 

@@ -215,6 +215,30 @@ body {
     50% { opacity: 0.8; }
 }
 
+/* Story Images */
+.story-image-container {
+    margin: 1.5rem 0;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn 1s ease-in forwards;
+}
+
+.story-image {
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    max-height: 400px;
+    border: 3px solid var(--sepia-medium);
+    border-radius: 5px;
+    box-shadow: 0 4px 12px var(--shadow);
+    filter: sepia(100%) contrast(1.1) brightness(0.9);
+    transition: transform 0.3s ease;
+}
+
+.story-image:hover {
+    transform: scale(1.02);
+}
+
 /* Choices */
 .choices-container {
     margin-top: 2rem;
